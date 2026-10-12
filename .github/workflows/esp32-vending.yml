@@ -1,0 +1,36 @@
+name: ESP32-S3 Vending Build
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "esp32/vending/**"
+      - "firmware/esp32-vending/**"
+      - ".github/workflows/esp32-vending.yml"
+
+jobs:
+  build-vending:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install PlatformIO
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade platformio
+
+      - name: Build ESP32-S3 Vending
+        working-directory: firmware/esp32-vending
+        run: pio run -e esp32-s3
+
+      - name: Upload firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: nvm-esp32-s3-vending-firmware
+          path: firmware/esp32-vending/.pio/build/esp32-s3/firmware.bin
